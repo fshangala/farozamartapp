@@ -1,37 +1,57 @@
+import 'package:farozamartapp/core/api.dart';
+import 'package:farozamartapp/core/models/listing.dart';
+import 'package:farozamartapp/core/not_null_future_renderer.dart';
 import 'package:flutter/material.dart';
 import 'package:farozamartapp/base_page.dart';
 
-class Home extends StatelessWidget {
+class HomePage extends StatefulWidget {
   static String routeName = '/';
-  const Home({super.key});
+  const HomePage({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  Future<List<Listing>> listingFuture = Future.value([]);
+
+  @override
+  void initState() {
+    super.initState();
+    listingFuture = FarozamartApi().listing();
+  }
+
+  void getListing() {
+    setState(() {
+      listingFuture = FarozamartApi().listing();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    var screenSize = MediaQuery.of(context).size;
-    var layout = _layoutBig(screenSize, context);
-    if (screenSize.width < 800) {
-      layout = _layoutSmall(screenSize, context);
-    }
     return BasePage(
+      title: 'Home',
       body: ListView(
-        children: [layout],
+        children: [_layout(context, listingFuture, getListing)],
       ),
     );
   }
 }
 
-Widget _layoutBig(Size size, BuildContext context) {
-  return Container(
-    margin: EdgeInsets.symmetric(horizontal: size.width / 5),
-    child: Column(children: products(size, context)),
-  );
-}
-
-Widget _layoutSmall(Size screenSize, BuildContext context) {
-  return Container(
-    margin: const EdgeInsets.symmetric(horizontal: 16),
-    child: Column(children: products(screenSize, context)),
-  );
+Widget _layout(BuildContext context, Future<List<Listing>> listingFuture,
+    void Function() getListing) {
+  var screenSize = MediaQuery.of(context).size;
+  if (screenSize.width < 800) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(children: [products(context, listingFuture, getListing)]),
+    );
+  } else {
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: screenSize.width / 5),
+      child: Column(children: [products(context, listingFuture, getListing)]),
+    );
+  }
 }
 
 Widget _buildButtonColumn(Color color, IconData icon, String label) {
@@ -57,32 +77,64 @@ Widget _buildButtonColumn(Color color, IconData icon, String label) {
       ));
 }
 
-List<Widget> products(Size screenSize, BuildContext context) {
-  return List.generate(
-      100,
-      (index) => Card(
-            child: Row(
-              children: [
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                      maxHeight: screenSize.height / 4,
-                      maxWidth: screenSize.width / 4),
-                  child: Image.asset(
-                    'images/default.png',
-                    fit: BoxFit.fill,
-                  ),
-                ),
-                Expanded(
-                    child: Column(
-                  children: [Text('Product $index'), Text('Category $index')],
-                )),
-                Row(
-                  children: [
-                    _buildButtonColumn(Theme.of(context).colorScheme.primary,
-                        Icons.add_shopping_cart, 'Add to cart')
-                  ],
-                )
-              ],
-            ),
-          ));
+Widget products(BuildContext context, Future<List<Listing>> futureListing,
+    void Function() getListing) {
+  var screenSize = MediaQuery.of(context).size;
+  return NotNullFutureRenderer(
+      future: futureListing,
+      futureRenderer: (listing) {
+        return Column(children: [
+          Column(
+            children: listing
+                .map((e) => Card(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ConstrainedBox(
+                            constraints: BoxConstraints(
+                                maxHeight: screenSize.height / 4,
+                                maxWidth: screenSize.width / 4),
+                            child: Image.network(
+                              "${FarozamartApi().baseUrl}${e.picture}",
+                              fit: BoxFit.fill,
+                            ),
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Column(
+                                    children: [
+                                      Text(e.name,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ))
+                                    ],
+                                  ),
+                                  Column(
+                                    children: [
+                                      _buildButtonColumn(
+                                          Theme.of(context).colorScheme.primary,
+                                          Icons.add_shopping_cart,
+                                          'Add to cart'),
+                                      Text("${e.price}"),
+                                    ],
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                    ))
+                .toList(),
+          ),
+          IconButton(
+              onPressed: () {
+                getListing();
+              },
+              icon: const Icon(Icons.replay))
+        ]);
+      });
 }

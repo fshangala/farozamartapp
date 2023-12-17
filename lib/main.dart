@@ -1,4 +1,6 @@
+import 'package:farozamartapp/cart_page.dart';
 import 'package:farozamartapp/home_page.dart';
+import 'package:farozamartapp/profile_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -17,10 +19,7 @@ class MyApp extends StatelessWidget {
             seedColor: const Color.fromARGB(255, 183, 58, 58)),
         useMaterial3: true,
       ),
-      initialRoute: '/',
-      routes: {
-        Home.routeName: (context) => const Home(),
-      },
+      home: const HomePage(),
     );
   }
 }
