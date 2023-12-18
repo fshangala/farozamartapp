@@ -1,21 +1,68 @@
 import 'dart:convert';
-import 'package:farozamartapp/core/models/listing.dart';
+import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:developer' as developer;
 
-class FarozamartApi {
+abstract class FarozamartApi<OBJ> {
   String baseUrl = 'http://localhost:8000';
-  Future<List<Listing>> listing() async {
-    var response = await http.get(Uri.parse('$baseUrl/api/v1/store/listing/'));
-    List<Map<String, dynamic>> data = (jsonDecode(response.body) as List)
-        .map((e) => e as Map<String, dynamic>)
-        .toList();
-    return data
-        .map((e) => Listing(
-            id: e['id'],
-            name: e['inventory']['name'],
-            price: e['get_sale_price'],
-            currency: e['currency']['code'],
-            picture: e['inventory']['picture']))
-        .toList();
+  dynamic responseError;
+
+  OBJ mapToObject(Map<String, dynamic> data);
+
+  Future<String?> getToken() async {
+    var instance = await SharedPreferences.getInstance();
+    var token = instance.getString('token');
+    return token;
+  }
+
+  Future<bool> saveToken({required String token}) async {
+    var instance = await SharedPreferences.getInstance();
+    return instance.setString('token', token);
+  }
+
+  dynamic handleResponse(http.Response response) {
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    }
+    responseError = jsonDecode(response.body);
+    return null;
+  }
+
+  Future<dynamic> get({required String endpoint, String? token}) async {
+    late http.Response response;
+    try {
+      if (token == null) {
+        response = await http.get(Uri.parse('$baseUrl$endpoint'));
+      } else {
+        developer.log(token, name: 'Using token');
+        response = await http.get(Uri.parse('$baseUrl$endpoint'), headers: {
+          HttpHeaders.authorizationHeader: 'Token $token',
+          HttpHeaders.contentTypeHeader: 'application/json',
+        });
+      }
+    } catch (e) {
+      responseError = e.toString();
+      return null;
+    }
+    return handleResponse(response);
+  }
+
+  Future<dynamic> post(
+      {required String endpoint,
+      required Map<String, dynamic> data,
+      String? token}) async {
+    late http.Response response;
+    try {
+      if (token == null) {
+        response = await http.post(Uri.parse('$baseUrl$endpoint'), body: data);
+      } else {
+        response = await http.post(Uri.parse('$baseUrl$endpoint'),
+            headers: {'Authorization': 'Token $token'}, body: data);
+      }
+    } catch (e) {
+      return null;
+    }
+    return handleResponse(response);
   }
 }

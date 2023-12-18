@@ -1,5 +1,7 @@
 import 'package:farozamartapp/base_page.dart';
 import 'package:farozamartapp/core/auth_state.dart';
+import 'package:farozamartapp/core/models/user.dart';
+import 'package:farozamartapp/widgets/null_future_renderer.dart';
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -10,14 +12,21 @@ class ProfilePage extends StatefulWidget {
   State<StatefulWidget> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState extends AuthState<ProfilePage> {
   @override
   Widget build(BuildContext context) {
-    return BasePage(title: 'Profile', body: layout(context));
+    return BasePage(
+        title: 'Profile',
+        body: NullFutureRenderer(
+          future: userFuture,
+          futureRenderer: (userObject) {
+            return layout(context, userObject);
+          },
+        ));
   }
 }
 
-Widget layout(BuildContext context) {
+Widget layout(BuildContext context, UserObject userObject) {
   var screenSize = MediaQuery.of(context).size;
   Widget largeScreens = ListView(
     children: [
@@ -35,7 +44,10 @@ Widget layout(BuildContext context) {
             ),
             Expanded(
                 child: Column(
-              children: [Text('Username'), Text('Full name')],
+              children: [
+                Text(userObject.username),
+                Text('${userObject.firstName} ${userObject.lastName}')
+              ],
             ))
           ],
         ),

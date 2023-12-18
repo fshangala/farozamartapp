@@ -1,6 +1,4 @@
-import 'package:farozamartapp/cart_page.dart';
 import 'package:farozamartapp/home_page.dart';
-import 'package:farozamartapp/profile_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {

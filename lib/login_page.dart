@@ -1,4 +1,5 @@
 import 'package:farozamartapp/base_page.dart';
+import 'package:farozamartapp/widgets/login_form.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatelessWidget {
@@ -10,16 +11,31 @@ class LoginPage extends StatelessWidget {
     return BasePage(
       title: 'Login',
       body: ListView(
-        children: [layout(context)],
+        children: [_layout(context)],
       ),
     );
   }
 }
 
-Widget layout(BuildContext context) {
-  if (MediaQuery.of(context).size.width < 800) {
-    return Column();
+Widget _layout(BuildContext context) {
+  var screenSize = MediaQuery.of(context).size;
+  if (screenSize.width < 800) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(children: [_loginWidget(context)]),
+    );
   } else {
-    return Column();
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: screenSize.width / 5),
+      child: Column(children: [_loginWidget(context)]),
+    );
   }
+}
+
+Widget _loginWidget(BuildContext context) {
+  return LoginForm(
+    setUser: (luser) {
+      Navigator.of(context).pop();
+    },
+  );
 }

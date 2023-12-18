@@ -1,6 +1,8 @@
-import 'package:farozamartapp/core/api.dart';
+import 'package:farozamartapp/core/auth_state.dart';
 import 'package:farozamartapp/core/models/listing.dart';
-import 'package:farozamartapp/core/not_null_future_renderer.dart';
+import 'package:farozamartapp/core/models/user.dart';
+import 'package:farozamartapp/widgets/not_null_future_renderer.dart';
+import 'package:farozamartapp/widgets/null_future_renderer.dart';
 import 'package:flutter/material.dart';
 import 'package:farozamartapp/base_page.dart';
 
@@ -12,18 +14,18 @@ class HomePage extends StatefulWidget {
   State<StatefulWidget> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  Future<List<Listing>> listingFuture = Future.value([]);
+class _HomePageState extends AuthState<HomePage> {
+  Future<List<ListingObject>> listingFuture = Future.value([]);
 
   @override
   void initState() {
     super.initState();
-    listingFuture = FarozamartApi().listing();
+    listingFuture = Listing().listing();
   }
 
   void getListing() {
     setState(() {
-      listingFuture = FarozamartApi().listing();
+      listingFuture = Listing().listing();
     });
   }
 
@@ -31,15 +33,18 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return BasePage(
       title: 'Home',
-      body: ListView(
-        children: [_layout(context, listingFuture, getListing)],
+      body: NullFutureRenderer(
+        future: userFuture,
+        futureRenderer: (userObject) => ListView(
+          children: [_layout(context, userObject, listingFuture, getListing)],
+        ),
       ),
     );
   }
 }
 
-Widget _layout(BuildContext context, Future<List<Listing>> listingFuture,
-    void Function() getListing) {
+Widget _layout(BuildContext context, UserObject userObject,
+    Future<List<ListingObject>> listingFuture, void Function() getListing) {
   var screenSize = MediaQuery.of(context).size;
   if (screenSize.width < 800) {
     return Container(
@@ -77,12 +82,24 @@ Widget _buildButtonColumn(Color color, IconData icon, String label) {
       ));
 }
 
-Widget products(BuildContext context, Future<List<Listing>> futureListing,
+Widget products(BuildContext context, Future<List<ListingObject>> futureListing,
     void Function() getListing) {
   var screenSize = MediaQuery.of(context).size;
   return NotNullFutureRenderer(
       future: futureListing,
       futureRenderer: (listing) {
+        if (listing.isEmpty) {
+          return Column(
+            children: [
+              const Text('No products to show'),
+              IconButton(
+                  onPressed: () {
+                    getListing();
+                  },
+                  icon: const Icon(Icons.replay))
+            ],
+          );
+        }
         return Column(children: [
           Column(
             children: listing
@@ -95,7 +112,7 @@ Widget products(BuildContext context, Future<List<Listing>> futureListing,
                                 maxHeight: screenSize.height / 4,
                                 maxWidth: screenSize.width / 4),
                             child: Image.network(
-                              "${FarozamartApi().baseUrl}${e.picture}",
+                              "${Listing().baseUrl}${e.picture}",
                               fit: BoxFit.fill,
                             ),
                           ),
@@ -118,7 +135,7 @@ Widget products(BuildContext context, Future<List<Listing>> futureListing,
                                           Theme.of(context).colorScheme.primary,
                                           Icons.add_shopping_cart,
                                           'Add to cart'),
-                                      Text("${e.price}"),
+                                      Text(e.price),
                                     ],
                                   )
                                 ],

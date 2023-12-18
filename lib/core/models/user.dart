@@ -1,91 +1,56 @@
+import 'package:farozamartapp/core/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:farozamartapp/core/models/model.dart';
+import 'dart:developer' as developer;
 
-class UserModelArguments {
-  String? id;
+class UserObject {
+  int id;
   String username;
   String firstName;
   String lastName;
-  String password;
-
-  UserModelArguments(
-      {this.id,
+  UserObject(
+      {required this.id,
       required this.username,
       required this.firstName,
-      required this.lastName,
-      required this.password});
+      required this.lastName});
 }
 
-class User extends Model<User, UserModelArguments> {
-  String? id;
-  late String username;
-  late String firstName;
-  late String lastName;
-  late String password;
-
+class User extends FarozamartApi<UserObject> {
   @override
-  String collection = 'bankingGroupTransactions';
-
-  @override
-  User create(UserModelArguments arguments) {
-    var user = User();
-    user.id = arguments.id;
-    user.username = arguments.username;
-    user.firstName = arguments.firstName;
-    user.lastName = arguments.lastName;
-    user.password = arguments.password;
-    return user;
+  UserObject mapToObject(Map<String, dynamic> data) {
+    return UserObject(
+        id: data['id'],
+        username: data['username'],
+        firstName: data['first_name'],
+        lastName: data['last_name']);
   }
 
-  @override
-  User? fromMap(Map<String, dynamic>? data) {
+  Future<UserObject?> getTokenUser() async {
+    var token = await getToken();
+    var data = await get(
+        endpoint: '/api/v1/accounts/token-user/', token: token.toString());
+    developer.log(data.toString(), name: 'token user request results');
     if (data == null) {
       return null;
-    } else {
-      return create(UserModelArguments(
-          id: data['id'],
-          username: data['username'],
-          firstName: data['firstName'],
-          lastName: data['lastName'],
-          password: data['password']));
     }
+    return mapToObject(data as Map<String, dynamic>);
   }
 
-  @override
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'username': username,
-      'firstName': firstName,
-      'lastName': lastName,
-      'password': password
-    };
-  }
-
-  Future<User?> loggedInUser() async {
-    var instance = await SharedPreferences.getInstance();
-    var userId = instance.getString('loggedInUser');
-    if (userId == null) {
+  Future<UserObject?> login(String username, String password) async {
+    var data = await post(
+            endpoint: '/api/auth/login/',
+            data: {'username': username, 'password': password})
+        as Map<String, dynamic>;
+    developer.log(data.toString(), name: 'after login request');
+    if (data['token'] != null) {
+      saveToken(token: data['token']);
+      return await getTokenUser();
+    } else {
       return null;
-    } else {
-      return User().getObject(QueryBuilder().where('id', userId));
     }
-  }
-
-  Future<User?> login(String username, String password) async {
-    User? luser;
-    var user =
-        await User().getObject(QueryBuilder().where('username', username));
-    if (user != null && user.password == password) {
-      luser = user;
-      var instance = await SharedPreferences.getInstance();
-      instance.setString('loggedInUser', user.id!);
-    }
-    return luser;
   }
 
   Future<bool> logout() async {
     var instance = await SharedPreferences.getInstance();
-    return await instance.remove('loggedInUser');
+    return await instance.remove('token');
   }
 }
