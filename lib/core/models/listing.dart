@@ -28,7 +28,8 @@ class Listing extends FarozamartApi<ListingObject> {
   }
 
   Future<List<ListingObject>> listing() async {
-    var response = await get(endpoint: '/api/v1/store/listing/');
+    var token = await getToken();
+    var response = await get(endpoint: '/api/v1/store/listing/', token: token);
     if (response == null) {
       return [];
     } else {

@@ -15,17 +15,18 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends AuthState<HomePage> {
+  Listing listingApi = Listing();
   Future<List<ListingObject>> listingFuture = Future.value([]);
 
   @override
   void initState() {
     super.initState();
-    listingFuture = Listing().listing();
+    listingFuture = listingApi.listing();
   }
 
   void getListing() {
     setState(() {
-      listingFuture = Listing().listing();
+      listingFuture = listingApi.listing();
     });
   }
 
@@ -33,10 +34,15 @@ class _HomePageState extends AuthState<HomePage> {
   Widget build(BuildContext context) {
     return BasePage(
       title: 'Home',
-      body: NullFutureRenderer(
-        future: userFuture,
-        futureRenderer: (userObject) => ListView(
-          children: [_layout(context, userObject, listingFuture, getListing)],
+      body: RefreshIndicator(
+        onRefresh: () async {
+          getListing();
+        },
+        child: NullFutureRenderer(
+          future: userFuture,
+          futureRenderer: (userObject) => ListView(
+            children: [_layout(context, userObject, listingFuture, getListing)],
+          ),
         ),
       ),
     );
@@ -89,14 +95,9 @@ Widget products(BuildContext context, Future<List<ListingObject>> futureListing,
       future: futureListing,
       futureRenderer: (listing) {
         if (listing.isEmpty) {
-          return Column(
+          return const Column(
             children: [
-              const Text('No products to show'),
-              IconButton(
-                  onPressed: () {
-                    getListing();
-                  },
-                  icon: const Icon(Icons.replay))
+              Text('No products to show'),
             ],
           );
         }
@@ -133,8 +134,8 @@ Widget products(BuildContext context, Future<List<ListingObject>> futureListing,
                                     children: [
                                       _buildButtonColumn(
                                           Theme.of(context).colorScheme.primary,
-                                          Icons.add_shopping_cart,
-                                          'Add to cart'),
+                                          Icons.shopping_bag,
+                                          'View'),
                                       Text(e.price),
                                     ],
                                   )
@@ -147,11 +148,6 @@ Widget products(BuildContext context, Future<List<ListingObject>> futureListing,
                     ))
                 .toList(),
           ),
-          IconButton(
-              onPressed: () {
-                getListing();
-              },
-              icon: const Icon(Icons.replay))
         ]);
       });
 }
