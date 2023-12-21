@@ -1,6 +1,5 @@
 import 'package:farozamartapp/core/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:developer' as developer;
 
 class UserObject {
   int id;
@@ -27,8 +26,9 @@ class User extends FarozamartApi<UserObject> {
   Future<UserObject?> getTokenUser() async {
     var token = await getToken();
     var data = await get(
-        endpoint: '/api/v1/accounts/token-user/', token: token.toString());
-    developer.log(data.toString(), name: 'token user request results');
+      endpoint: '/api/v1/accounts/token-user/',
+      token: token.toString(),
+    );
     if (data == null) {
       return null;
     }
@@ -37,10 +37,9 @@ class User extends FarozamartApi<UserObject> {
 
   Future<UserObject?> login(String username, String password) async {
     var data = await post(
-            endpoint: '/api/auth/login/',
-            data: {'username': username, 'password': password})
-        as Map<String, dynamic>;
-    developer.log(data.toString(), name: 'after login request');
+      endpoint: '/api/auth/login/',
+      data: {'username': username, 'password': password},
+    ) as Map<String, dynamic>;
     if (data['token'] != null) {
       saveToken(token: data['token']);
       return await getTokenUser();

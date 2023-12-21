@@ -53,7 +53,7 @@ Widget layout(BuildContext context, UserObject userObject) {
         ),
       ),
       Card(
-        child: Column(children: [Text('Orders'), orders()]),
+        child: Column(children: [const Text('Orders'), orders()]),
       )
     ],
   );
@@ -65,7 +65,7 @@ Widget layout(BuildContext context, UserObject userObject) {
 }
 
 Widget orders() {
-  return Column(
+  return const Column(
     children: [
       Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,

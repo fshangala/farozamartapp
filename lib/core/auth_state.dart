@@ -5,6 +5,7 @@ import 'package:farozamartapp/core/models/user.dart';
 import 'package:farozamartapp/login_page.dart';
 
 abstract class AuthState<T extends StatefulWidget> extends State<T> {
+  User userApi = User();
   late Future<UserObject?> userFuture;
 
   void afterInit() {}
@@ -12,14 +13,17 @@ abstract class AuthState<T extends StatefulWidget> extends State<T> {
   @override
   initState() {
     super.initState();
-    var request = User();
-    userFuture = request.getTokenUser();
+    getUser();
     userFuture.then((value) {
       if (value == null) {
-        displayRegularSnackBar(context, request.responseError.toString());
+        displayRegularSnackBar(context, userApi.responseError.toString());
         goTo(context: context, page: const LoginPage());
       }
     });
     afterInit();
+  }
+
+  getUser() {
+    userFuture = userApi.getTokenUser();
   }
 }

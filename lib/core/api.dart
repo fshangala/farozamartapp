@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:developer' as developer;
 
 abstract class FarozamartApi<OBJ> {
   String baseUrl = 'http://localhost:8000';
@@ -35,7 +34,6 @@ abstract class FarozamartApi<OBJ> {
       if (token == null) {
         response = await http.get(Uri.parse('$baseUrl$endpoint'));
       } else {
-        developer.log(token, name: 'Using token');
         response = await http.get(Uri.parse('$baseUrl$endpoint'), headers: {
           HttpHeaders.authorizationHeader: 'Token $token',
           HttpHeaders.contentTypeHeader: 'application/json',

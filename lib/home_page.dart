@@ -1,6 +1,8 @@
 import 'package:farozamartapp/core/auth_state.dart';
+import 'package:farozamartapp/core/functions.dart';
 import 'package:farozamartapp/core/models/listing.dart';
 import 'package:farozamartapp/core/models/user.dart';
+import 'package:farozamartapp/listing_page.dart';
 import 'package:farozamartapp/widgets/not_null_future_renderer.dart';
 import 'package:farozamartapp/widgets/null_future_renderer.dart';
 import 'package:flutter/material.dart';
@@ -65,9 +67,13 @@ Widget _layout(BuildContext context, UserObject userObject,
   }
 }
 
-Widget _buildButtonColumn(Color color, IconData icon, String label) {
+Widget _buildButtonColumn(
+    {required Color color,
+    required IconData icon,
+    required String label,
+    required void Function() onPressed}) {
   return TextButton(
-      onPressed: () {},
+      onPressed: onPressed,
       child: Container(
         padding: const EdgeInsets.all(8),
         child: Column(
@@ -133,9 +139,17 @@ Widget products(BuildContext context, Future<List<ListingObject>> futureListing,
                                   Column(
                                     children: [
                                       _buildButtonColumn(
-                                          Theme.of(context).colorScheme.primary,
-                                          Icons.shopping_bag,
-                                          'View'),
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        icon: Icons.shopping_bag,
+                                        label: 'View',
+                                        onPressed: () {
+                                          goTo(
+                                              context: context,
+                                              page: ListingPage(id: e.id));
+                                        },
+                                      ),
                                       Text(e.price),
                                     ],
                                   )

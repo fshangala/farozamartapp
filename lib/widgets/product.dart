@@ -62,7 +62,7 @@ Widget buttonSection = Row(
   ],
 );
 
-Widget Product() {
+Widget product() {
   return Column(
     children: [
       Column(

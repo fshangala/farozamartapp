@@ -1,5 +1,4 @@
 import 'package:farozamartapp/base_page.dart';
-import 'package:farozamartapp/core/auth_state.dart';
 import 'package:flutter/material.dart';
 
 class CartPage extends StatefulWidget {
@@ -33,7 +32,7 @@ Widget layout(BuildContext context) {
                 fit: BoxFit.fill,
               ),
             ),
-            Expanded(
+            const Expanded(
                 child: Column(
               children: [Text('Username'), Text('Full name')],
             ))
@@ -41,10 +40,10 @@ Widget layout(BuildContext context) {
         ),
       ),
       Card(
-        child: Column(children: [Text('Cart'), cartItems()]),
+        child: Column(children: [const Text('Cart'), cartItems()]),
       ),
       Card(
-        child: Column(children: [Text('Cart Summery'), cartItems()]),
+        child: Column(children: [const Text('Cart Summery'), cartItems()]),
       )
     ],
   );
@@ -56,7 +55,7 @@ Widget layout(BuildContext context) {
 }
 
 Widget cartItems() {
-  return Column(
+  return const Column(
     children: [
       Row(children: [Text('Product'), Text('Quantity')])
     ],
