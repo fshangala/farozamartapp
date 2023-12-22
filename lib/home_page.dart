@@ -38,6 +38,7 @@ class _HomePageState extends AuthState<HomePage> {
       title: 'Home',
       body: RefreshIndicator(
         onRefresh: () async {
+          getUser();
           getListing();
         },
         child: NullFutureRenderer(

@@ -1,4 +1,6 @@
 import 'package:farozamartapp/core/models/listing.dart';
+import 'package:farozamartapp/core/resolve_future.dart';
+import 'package:farozamartapp/widgets/display_regular_snackbar.dart';
 import 'package:flutter/material.dart';
 
 class AddToCartForm extends StatefulWidget {
@@ -24,7 +26,10 @@ class _AddToCartFormState extends State<AddToCartForm> {
           Container(
               padding: const EdgeInsets.all(8),
               child: TextFormField(
-                decoration: const InputDecoration(label: Text('Quanatity')),
+                decoration: const InputDecoration(
+                  label: Text('Quanatity'),
+                  constraints: BoxConstraints.tightFor(width: 200),
+                ),
                 keyboardType: TextInputType.number,
                 controller: quantityController,
                 validator: (value) {
@@ -59,5 +64,17 @@ class _AddToCartFormState extends State<AddToCartForm> {
     );
   }
 
-  void _addToCart() {}
+  void _addToCart() {
+    var listing = Listing();
+    resolveFuture(
+      context,
+      listing.addToCart(
+        widget.product.id,
+        {"quantity": quantityController.text},
+      ),
+      (value) {
+        displayRegularSnackBar(context, 'Product added to cart');
+      },
+    );
+  }
 }
