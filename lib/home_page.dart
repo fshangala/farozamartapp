@@ -41,11 +41,14 @@ class _HomePageState extends AuthState<HomePage> {
           getUser();
           getListing();
         },
-        child: NullFutureRenderer(
-          future: userFuture,
-          futureRenderer: (userObject) => ListView(
-            children: [_layout(context, userObject, listingFuture, getListing)],
-          ),
+        child: ListView(
+          children: [
+            NullFutureRenderer(
+              future: userFuture,
+              futureRenderer: (userObject) =>
+                  _layout(context, userObject, listingFuture, getListing),
+            ),
+          ],
         ),
       ),
     );
