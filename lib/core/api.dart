@@ -4,7 +4,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class FarozamartApi<OBJ> {
-  String baseUrl = 'http://localhost:8000';
+  //String baseUrl = 'http://localhost:8000';
+  String baseUrl = 'https://farozamart.com';
   dynamic responseError;
 
   OBJ mapToObject(Map<String, dynamic> data);
