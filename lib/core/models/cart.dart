@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:farozamartapp/core/api.dart';
 import 'package:farozamartapp/core/models/sales.dart';
 import 'package:farozamartapp/core/models/user.dart';
@@ -39,6 +41,19 @@ class Cart extends FarozamartApi<CartObject> {
     var token = await getToken();
     var response =
         await get(endpoint: '/api/v1/store/cart/get_cart/', token: token);
+    if (response == null) {
+      return null;
+    } else {
+      Map<String, dynamic> data = response as Map<String, dynamic>;
+      log(data.toString());
+      return mapToObject(data);
+    }
+  }
+
+  Future<CartObject?> CODPayment(int order_id) async {
+    var token = await getToken();
+    var response = await get(
+        endpoint: '/api/v1/store/cart/$order_id/get_cart/', token: token);
     if (response == null) {
       return null;
     } else {

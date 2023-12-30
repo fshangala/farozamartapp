@@ -24,7 +24,7 @@ abstract class FarozamartApi<OBJ> {
     if (response.statusCode == 200) {
       return jsonDecode(response.body);
     }
-    responseError = jsonDecode(response.body);
+    responseError = response.body;
     return null;
   }
 

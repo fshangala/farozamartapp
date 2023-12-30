@@ -1,6 +1,8 @@
 import 'package:farozamartapp/base_page.dart';
 import 'package:farozamartapp/core/auth_state.dart';
 import 'package:farozamartapp/core/models/cart.dart';
+import 'package:farozamartapp/core/resolve_future.dart';
+import 'package:farozamartapp/widgets/display_regular_snackbar.dart';
 import 'package:farozamartapp/widgets/null_future_renderer.dart';
 import 'package:flutter/material.dart';
 
@@ -51,7 +53,28 @@ class _CartPageState extends AuthState<CartPage> {
             ),
             Card(
               child: Column(
-                children: [const Text('Cart Summery'), cartSummery(cartObject)],
+                children: [
+                  const Text('Cart Summery'),
+                  cartSummery(cartObject),
+                  const Text('Payment methods'),
+                  TextButton(
+                    onPressed: () {
+                      resolveFuture(context, cartApi.CODPayment(cartObject.id),
+                          (value) {
+                        if (value == null) {
+                          displayRegularSnackBar(context, 'Request failed');
+                        } else {
+                          displayRegularSnackBar(
+                              context, 'Order successfully placed!');
+                          setState(() {
+                            cartFuture = cartApi.getCart();
+                          });
+                        }
+                      });
+                    },
+                    child: const Text('Cash On Delivery'),
+                  )
+                ],
               ),
             )
           ],
