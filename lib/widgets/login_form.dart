@@ -1,4 +1,5 @@
 import 'package:farozamartapp/core/models/user.dart';
+import 'package:farozamartapp/core/resolve_future.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as developer;
 
@@ -71,8 +72,7 @@ class _LoginFormState extends State<LoginForm> {
 
   void _login(String username, String password) {
     var request = User();
-    request.login(username, password).then((value) {
-      developer.log(value.toString(), name: 'after login');
+    resolveFuture(context, request.login(username, password), (value) {
       if (value == null) {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(request.responseError.toString())));
