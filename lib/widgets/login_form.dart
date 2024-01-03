@@ -1,7 +1,6 @@
 import 'package:farozamartapp/core/models/user.dart';
 import 'package:farozamartapp/core/resolve_future.dart';
 import 'package:flutter/material.dart';
-import 'dart:developer' as developer;
 
 class LoginForm extends StatefulWidget {
   final void Function(UserObject luser)? setUser;
