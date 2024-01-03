@@ -73,7 +73,11 @@ class _AddToCartFormState extends State<AddToCartForm> {
         {"quantity": quantityController.text},
       ),
       (value) {
-        displayRegularSnackBar(context, 'Product added to cart');
+        if (value.isEmpty) {
+          displayRegularSnackBar(context, listing.responseError.toString());
+        } else {
+          displayRegularSnackBar(context, 'Product added to cart');
+        }
       },
     );
   }
