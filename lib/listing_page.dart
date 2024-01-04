@@ -1,7 +1,7 @@
 import 'package:farozamartapp/base_page.dart';
-import 'package:farozamartapp/core/auth_state.dart';
 import 'package:farozamartapp/core/models/listing.dart';
 import 'package:farozamartapp/widgets/add_to_cart_form.dart';
+import 'package:farozamartapp/widgets/get_image_from_network.dart';
 import 'package:farozamartapp/widgets/null_future_renderer.dart';
 import 'package:flutter/material.dart';
 
@@ -14,12 +14,13 @@ class ListingPage extends StatefulWidget {
   State<StatefulWidget> createState() => _ListingPageState();
 }
 
-class _ListingPageState extends AuthState<ListingPage> {
+class _ListingPageState extends State<ListingPage> {
   var listingApi = Listing();
   Future<ListingObject?> listingFuture = Future.value(null);
 
   @override
-  void afterInit() {
+  void initState() {
+    super.initState();
     listingFuture = listingApi.singleListing(widget.id);
   }
 
@@ -29,15 +30,9 @@ class _ListingPageState extends AuthState<ListingPage> {
       title: 'Listing',
       body: RefreshIndicator(
         onRefresh: () async {
-          getUser();
           listingFuture = listingApi.singleListing(widget.id);
         },
-        child: NullFutureRenderer(
-          future: userFuture,
-          futureRenderer: (userObject) {
-            return layout();
-          },
-        ),
+        child: layout(),
       ),
     );
   }
@@ -59,10 +54,8 @@ class _ListingPageState extends AuthState<ListingPage> {
                           maxHeight: screenSize.height / 4,
                           maxWidth: screenSize.width / 4,
                         ),
-                        child: Image.network(
-                          '${listingApi.baseUrl}${listingObject.picture}',
-                          fit: BoxFit.fill,
-                        ),
+                        child: getImageFromNetwork(
+                            '${listingApi.baseUrl}${listingObject.picture}'),
                       ),
                       Expanded(
                         child: Column(

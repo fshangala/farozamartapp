@@ -32,8 +32,7 @@ class Listing extends FarozamartApi<ListingObject> {
   }
 
   Future<List<ListingObject>> listing() async {
-    var token = await getToken();
-    var response = await get(endpoint: '/api/v1/store/listing/', token: token);
+    var response = await get(endpoint: '/api/v1/store/listing/');
     if (response == null) {
       return [];
     } else {
@@ -44,9 +43,7 @@ class Listing extends FarozamartApi<ListingObject> {
   }
 
   Future<ListingObject?> singleListing(int id) async {
-    var token = await getToken();
-    var response =
-        await get(endpoint: '/api/v1/store/listing/$id/', token: token);
+    var response = await get(endpoint: '/api/v1/store/listing/$id/');
     if (response == null) {
       return null;
     } else {
