@@ -59,7 +59,7 @@ class _CartPageState extends AuthState<CartPage> {
                   const Text('Payment methods'),
                   TextButton(
                     onPressed: () {
-                      resolveFuture(context, cartApi.CODPayment(cartObject.id),
+                      resolveFuture(context, cartApi.cODPayment(cartObject.id),
                           (value) {
                         if (value == null) {
                           displayRegularSnackBar(context, 'Request failed');
@@ -107,7 +107,7 @@ class _CartPageState extends AuthState<CartPage> {
                 cells: [
                   DataCell(Text(e.id.toString())),
                   DataCell(Text(e.name)),
-                  DataCell(Text('...')),
+                  const DataCell(Text('...')),
                   DataCell(Text(e.getSalePrice)),
                 ],
               ))

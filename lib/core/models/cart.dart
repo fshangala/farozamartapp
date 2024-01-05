@@ -50,10 +50,10 @@ class Cart extends FarozamartApi<CartObject> {
     }
   }
 
-  Future<CartObject?> CODPayment(int order_id) async {
+  Future<CartObject?> cODPayment(int orderId) async {
     var token = await getToken();
     var response = await get(
-        endpoint: '/api/v1/store/cart/$order_id/get_cart/', token: token);
+        endpoint: '/api/v1/store/cart/$orderId/get_cart/', token: token);
     if (response == null) {
       return null;
     } else {
